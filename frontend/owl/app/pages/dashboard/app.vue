@@ -5,7 +5,7 @@
 			<div class="scrollbar-sidebar">
 				<div class="scroll-sidebar">
 					<div class="sidebar-profile-container">
-						<i class="sidebar-logo icon user" title="Admin"></i> <span class="display-name"></span>
+						<i class="sidebar-logo icon user" title="Admin"></i><span class="display-name"></span>
 					</div>
 					<div class="sidebar-menu-container">
 						<sidebar-menu :menus="menus"></sidebar-menu>
