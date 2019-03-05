@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 import {
 	Loading,
 	MessageBox,
@@ -11,10 +12,10 @@ import {
 axios.defaults.timeout = 15000;
 //axios.defaults.headers.common['Authorization'] = 'Authorization';
 //axios.defaults.baseURL = 'http://localhost:12548/api';
-axios.defaults.baseURL ='http://localhost:12548/api';
+axios.defaults.baseURL ='http://localhost:7001';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 if (IS_PRODUCTION) {
-	axios.defaults.baseURL = "http://localhost:12548/api";
+	axios.defaults.baseURL = "http://qa.wozaihui.com";
 }
 
 

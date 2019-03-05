@@ -11,19 +11,29 @@
 				<el-form-item label="编号" prop="id">
 					<el-input v-model="form.id" auto-complete="off" disabled></el-input>
 				</el-form-item>
+				<el-row>
+					<el-col :span="10">
+						<el-form-item label="项目" prop="project_uid">
+							<el-select v-model="form.project_uid" placeholder="请选择项目" value="">
+								<el-option v-for="item in store.search.field.options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :span="10">
+						<el-form-item label="模块" prop="module_uid">
+							<el-select v-model="form.module_uid" placeholder="请选择模块" value="">
+								<el-option v-for="item in store.search.field.options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
 				<el-form-item label="接口名" prop="interface_name">
 					<el-input v-model="form.interface_name" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="path" prop="path">
-					<el-input v-model="form.path" auto-complete="off"></el-input>
+				<el-form-item label="接口url" prop="url">
+					<el-input v-model="form.url" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="query_param" prop="query_param">
-					<el-input v-model="form.query_param" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="path_param" prop="path_param">
-					<el-input v-model="form.path_param" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="body_param" prop="body_param">
+				<el-form-item label="接口参数" prop="body_param">
 					<el-input type='textarea' v-model="form.body_param" auto-complete="off" autosize></el-input>
 				</el-form-item>
 			</el-form>
@@ -52,15 +62,20 @@
 				</ul>
 				<section class="ts-search-container">
 					<el-row :gutter="2">
-						<el-col :span="2">
-							<el-select v-model="search.fieldName" placeholder="请选择字段">
+						<el-col :span="3">
+							<el-select v-model="search.fieldName" placeholder="请选择字段" value="">
 								<el-option v-for="item in store.search.field.options" :key="item.value" :label="item.label" :value="item.value"></el-option>
 							</el-select>
 						</el-col>
 						<el-col :span="3">
+							<el-select v-model="search.fieldName" aria-placeholder="请选择模块" value="">
+								<el-option v-for="item in store.search.field.options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+							</el-select>
+						</el-col>
+						<el-col :span="4">
 							<el-input v-model="search.fieldValue" placeholder="请输入关键字..." @keyup.enter.native="handleSearch"></el-input>
 						</el-col>
-						<el-col :span="3">
+						<el-col :span="4">
 							<el-button type="primary" icon="search" @click="handleSearch">搜 索</el-button>
 						</el-col>
 					</el-row>
@@ -74,24 +89,29 @@
 				</el-tooltip>
 			</template>
 		</toolstrip>
-		<el-table :data="table.data" stripe border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
-			<el-table-column type="selection" width="45" align="center">
-			</el-table-column>
-			<template v-for="col in showColumns">
-				<el-table-column :key="col.id" v-if="col.visible==null || col.visible" :prop="col.prop" :label="col.label" :width="col.width" :min-width="col.minWidth" :sortable="col.sortable">
+		<el-collapse accordion="true">
+			<el-table :data="table.data" stripe border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+				<el-table-column type="selection" width="45" align="center">
 				</el-table-column>
-			</template>
-			<el-table-column label="操作">
-				<template slot-scope="scope">
-					<el-tooltip class="item" effect="dark" content="编辑" placement="top">
-						<el-button type="in" size="mini" @click="handleEdit(scope.row.id)" icon="edit"></el-button>
-					</el-tooltip>
-					<el-tooltip class="item" effect="dark" content="删除" placement="top">
-						<el-button type="danger" size="mini" @click="handleDelete(scope.$index,scope.row.id)" icon="delete"></el-button>
-					</el-tooltip>
+				<template v-for="col in showColumns">
+					<el-table-column :key="col.id" v-if="col.visible==null || col.visible" :prop="col.prop" :label="col.label" :width="col.width" :min-width="col.minWidth" :sortable="col.sortable">
+					</el-table-column>
 				</template>
-			</el-table-column>
-		</el-table>
+				<el-table-column label="操作">
+					<template slot-scope="scope">
+						<el-tooltip class="item" effect="dark" content="编辑" placement="top">
+							<el-button type="info" size="small" @click="handleEdit(scope.row.id)" class="el-icon-edit"></el-button>
+						</el-tooltip>
+						<el-tooltip class="item" effect="dark" content="调试" placement="top">
+							<el-button type="warning" size="small" @click="handleDebug(scope.row.id)" class="el-icon-edit-outline">调试</el-button>
+						</el-tooltip>
+						<el-tooltip class="item" effect="dark" content="删除" placement="top">
+							<el-button type="danger" size="small" @click="handleDelete(scope.$index,scope.row.id)" class="el-icon-delete"></el-button>
+						</el-tooltip>
+					</template>
+				</el-table-column>
+			</el-table>
+		</el-collapse>
 		<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="search.pagination.currentPage" :page-sizes="search.pagination.pageSizes" :page-size="search.pagination.pageSize" layout="sizes, prev, pager, next, total" :total="search.pagination.total">
 		</el-pagination>
 	</div>
@@ -103,7 +123,7 @@ export default {
 		return {
 			dialog: {
 				visible: true,
-				title: '用户信息',
+				title: '接口信息',
 				action: 'create',
 				formLabelWidth: '120px'
 			},
@@ -111,13 +131,11 @@ export default {
 				visible: false
 			},
 			form: {
-				id: 0,
 				interface_name: '',
-				path: '',
-				query_param: '',
-				path_param: '',
+				url: '',
+                project_uid: '',
+				module_uid: '',
 				body_param: '',
-				ip_address: ''
 			},
 			rules: {
 				interface_name: [{
@@ -126,12 +144,17 @@ export default {
 					trigger: 'blur'
 				}
 				],
-				path: [{
+				url: [{
 					required: true,
 					message: '请输入接口url',
 					trigger: 'blur'
 				}
 				],
+				project_uid: [{
+				    required: true,
+					message: '请选择项目名',
+					trigger: 'blur'
+				}],
 			},
 			search: {
 				fieldName: 'interface_name',
@@ -157,59 +180,51 @@ export default {
 							value: 'interface_name',
 							label: '接口名'
 						}, {
-							value: 'path',
-							label: 'path'
+							value: 'url',
+							label: 'url'
 						}, {
-							value: 'query_param',
-							label: 'query_param'
+							value: 'project_name',
+							label: 'project_name'
 						}, {
-							value: 'path_param',
-							label: 'path_param'
+							value: 'module_name',
+							label: 'module_name'
 						}, {
-							value: 'body_param',
-							label: 'body_param'
+							value: 'body_params',
+							label: 'body_params'
 						}]
 					}
 				}
 			},
 			table: {
 				columns: [{
-					label: '#',
-					prop: 'id',
-					sortable: true,
-					width: 60
-				},
-				{
 					label: '接口名称',
 					prop: 'interface_name',
 					sortable: true,
-					width: 180,
-					visible: true
 				},
 				{
 					label: '接口路径',
-					prop: 'path',
+					prop: 'url',
 					sortable: true,
 					visible: true
 				},
 				{
-					label: 'Query Params',
-					prop: 'query_param',
-					sortable: true,
-					minWidth: 200
-				},
-				{
-					label: 'Path Params',
-					prop: 'path_param',
+					label: '项目名称',
+					prop: 'project_name',
 					sortable: true,
 					visible: true
 				},
 				{
-					label: 'Body Params',
-					prop: 'body_param',
+					label: '模块名称',
+					prop: 'module_name',
 					sortable: true,
 					visible: true
-				}
+				},
+				{
+					label: '请求参数',
+					prop: 'body_params',
+					sortable: true,
+					visible: true
+				},
 				],
 				data: []
 			}
@@ -288,13 +303,18 @@ export default {
 		handleEdit(id) {
 			var vm = this;
 			this.handleResetForm();
-			this.dialog.action = "edit";
-			this.$axios.get('/user/find?id=' + id)
-				.then(function (response) {
-					vm.form = response.data.data;
-					vm.dialog.visible = true;
-				})
-				.catch(function (error) { });
+			// this.dialog.action = "edit";
+			// this.$axios.get('/user/find?id=' + id)
+			// 	.then(function (response) {
+			// 		vm.form = response.data.data;
+			// 		vm.dialog.visible = true;
+			// 	})
+			// 	.catch(function (error) { });
+		},
+		handleDebug(id) {
+		    var vm = this;
+		    this.handleResetForm();
+		    this.dialog.action = 'debug';
 		},
 		handleCancelButton() {
 			this.dialog.visible = false
@@ -340,16 +360,31 @@ export default {
 			});
 		},
 		doCreate() {
-			this.$message("创建成功");
+			// this.$message("创建成功");
 			let m = JSON.parse(JSON.stringify(this.form));
-			m.id = this.table.data.length + 1;
-			m.ip_address = "127.0.0.1";
+			var qs = require('qs');
+			console.log(m)
+			// m.id = this.table.data.length + 1;
+			// m.ip_address = "127.0.0.1";
+            this.$axios.post('/interface', qs.stringify(m))
+                .then(rsp=>{
+                    console.log('succsee:')
+                    console.log(rsp)
+                })
+                .catch(error=>{
+                    console.log(error)
+                });
 			this.table.data.push(m);
 			//TODO:此处进行后台创建数据操作...
 		},
 		doUpdate() {
 			this.$message("更新成功");
 			//TODO:此处进行后台更新数据操作...
+		},
+		doDebug() {
+		    this.$message('调用成功');
+		    // TODO 此处进行后台接口调用
+			let m = Json.parse(Json.stringify(this.form));
 		},
 		handleSelectionChange(val) {
 			this.command.selectedRows = val.map(m => m.id);
